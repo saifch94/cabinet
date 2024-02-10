@@ -1,5 +1,4 @@
 <?php
-include('../includes/header.php');
 session_start();
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'ADMIN') {
