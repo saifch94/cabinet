@@ -1,54 +1,37 @@
 <?php
+include 'db_connection.php';
+// If the form is submitted
 session_start();
 
-// If the form is submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate login credentials
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-    // Connect to the database
-    include 'db_connection.php';
+    $sql = "SELECT * FROM Patient WHERE uname='$username'";
+    $result = $conn->query($sql);
 
-    // Prepare and execute the SQL query
-    $stmt = $conn->prepare("SELECT * FROM Patient WHERE uname = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    // Check for errors
-    if (!$result) {
-        die('Error executing query: ' . $conn->error);
-    }
-
-    // Check if the username exists
-    if ($result->num_rows === 1) {
-        // Fetch the user's data
+    if ($result->num_rows == 1) {
         $row = $result->fetch_assoc();
 
-        // Verify the password
-        if (password_verify($password, $row['password'])) {
-            // Correct credentials
+        // Check the password
+        if (password_verify($password, $row['pwd'])) {
             $_SESSION['username'] = $username;
             $_SESSION['role'] = $row['roleP'];
-            if ($row['roleP'] === 'ADMIN') {
-                header("Location: superadmin.php");
-                exit;
-            } elseif ($row['roleP'] === 'PATIENT') {
-                header("Location: patient_dashboard.php");
-                exit;
+
+            if ($_SESSION['role'] === 'ADMIN') {
+                header("Location: ./superadmin.php");
+                exit();
+            } elseif ($_SESSION['role'] === 'PATIENT') {
+                header("Location: ./patient_dashboard.php");
+                exit();
             }
         } else {
-            // Incorrect password
-            $_SESSION['login_error'] = 'Invalid password.';
-            header("Location: login.php");
-            exit;
+          $_SESSION['login_error'] = 'Invalid password.';
+          echo "Login failed. Incorrect password.";
         }
     } else {
-        // Username does not exist
-        $_SESSION['login_error'] = 'Invalid username.';
-        header("Location: login.php");
-        exit;
+      $_SESSION['login_error'] = 'User not found.';
+      echo "Login failed. User not found.";
     }
 }
 ?>

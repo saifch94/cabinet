@@ -24,22 +24,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     include 'db_connection.php';
 
     // Check if the username already exists
-    $sql_check_username = "SELECT * FROM Patient WHERE uname = ?";
-    $stmt_check_username = $conn->prepare($sql_check_username);
-    $stmt_check_username->bind_param("s", $username);
-    $stmt_check_username->execute();
-    $result_check_username = $stmt_check_username->get_result();
+    $sql_check_username = "SELECT * FROM Patient WHERE uname = '$username'";
+    $result = $conn->query($sql);
 
-    if ($result_check_username->num_rows > 0) {
+    if ($result->num_rows > 0) {
         $_SESSION['register_error'] = 'Username already exists. Please choose a different one.';
         header("Location: register.php");
         exit;
-    }
+    }    
 
     // Insert the new user into the database
-    $sql_insert_user = "INSERT INTO Patient (firstname, lastname, uname, pwd, numTel) VALUES (?, ?, ?, ?, ?)";
-    $stmt_insert_user = $conn->prepare($sql_insert_user);
-    $stmt_insert_user->bind_param("sssss", $firstname, $lastname, $username, $hashed_password, $numTel);
+    $sql_insert_user = "INSERT INTO Patient (firstname, lastname, uname, pwd, numTel) VALUES ('$firstname', '$lastname', '$username', '$hashed_password', '$numTel')";
+    $result = $conn->query($sql_insert_user);
 
     if ($stmt_insert_user->execute()) {
         // Registration successful
