@@ -1,12 +1,12 @@
 -- Create Patient table
 CREATE TABLE Patient (
     IdP INT PRIMARY KEY AUTO_INCREMENT,
-    Nomp VARCHAR(255),
-    prénomP VARCHAR(255),
-    NumTel VARCHAR(15),
-    password VARCHAR(255), -- Add a password field
-    roleP VARCHAR(50) DEFAULT 'PATIENT', -- Set a default role and increase length for better clarity
-    UNIQUE (NumTel) -- Ensure NumTel is unique
+    firstname VARCHAR(255),
+    lastname VARCHAR(255),
+    uname VARCHAR(255) UNIQUE,
+    pwd VARCHAR(255),
+    numTel VARCHAR(15) UNIQUE,
+    roleP VARCHAR(50) DEFAULT 'PATIENT'
 );
 
 -- Create Kiné table
@@ -27,3 +27,11 @@ CREATE TABLE Séance (
     FOREIGN KEY (IdK) REFERENCES Kiné(IdK),
     FOREIGN KEY (IdP) REFERENCES Patient(IdP)
 );
+
+-- Correcting Séance table to include Kiné and Patient details
+SELECT Séance.*, Kiné.NomK AS Kiné_Nom, Kiné.PrénomK AS Kiné_Prénom, Patient.firstname AS Patient_Nom, Patient.lastname AS Patient_Prénom
+FROM Séance
+LEFT JOIN Kiné ON Séance.IdK = Kiné.IdK
+LEFT JOIN Patient ON Séance.IdP = Patient.IdP;
+
+INSERT INTO Patient (firstname, lastname, uname, pwd, numTel, roleP) VALUES ("admin", "admin", "admin", "admin123", "123456789", "ADMIN");
