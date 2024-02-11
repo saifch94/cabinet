@@ -1,14 +1,15 @@
 <?php
+include 'db_connection.php';
 session_start();
 
 // If the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate form inputs
-    $firstname = $_POST['firstname'] ?? '';
-    $lastname = $_POST['lastname'] ?? '';
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
-    $numTel = $_POST['numTel'] ?? '';
+    $firstname = $_POST['firstname'];
+    $lastname = $_POST['lastname'];
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $numTel = $_POST['numTel'];
 
     // Validate if all fields are not empty
     if (empty($firstname) || empty($lastname) || empty($username) || empty($password) || empty($numTel)) {
@@ -20,30 +21,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Hash the password
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    // Connect to the database
-    include 'db_connection.php';
-
     // Check if the username already exists
     $sql_check_username = "SELECT * FROM Patient WHERE uname = '$username'";
-    $result = $conn->query($sql);
+    $result = $conn->query($sql_check_username);
 
     if ($result->num_rows > 0) {
         $_SESSION['register_error'] = 'Username already exists. Please choose a different one.';
         header("Location: register.php");
         exit;
-    }    
+    }
 
     // Insert the new user into the database
     $sql_insert_user = "INSERT INTO Patient (firstname, lastname, uname, pwd, numTel) VALUES ('$firstname', '$lastname', '$username', '$hashed_password', '$numTel')";
-    $result = $conn->query($sql_insert_user);
-
-    if ($stmt_insert_user->execute()) {
-        // Registration successful
+    if ($conn->query($sql_insert_user) === TRUE) {
         $_SESSION['register_success'] = 'Registration successful. You can now login.';
         header("Location: login.php");
         exit;
     } else {
-        // Registration failed
         $_SESSION['register_error'] = 'Registration failed. Please try again later.';
         header("Location: register.php");
         exit;
@@ -109,4 +103,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
-

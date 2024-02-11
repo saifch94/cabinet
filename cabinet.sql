@@ -24,7 +24,7 @@ CREATE TABLE Séance (
     DateS DATE,
     HeureS TIME,
     TypeSoin VARCHAR(255),
-    FOREIGN KEY (IdK) REFERENCES Kiné(IdK),
+    FOREIGN KEY (IdK) REFERENCES Kiné(IdK) ON DELETE CASCADE,  -- Define foreign key with ON DELETE CASCADE
     FOREIGN KEY (IdP) REFERENCES Patient(IdP)
 );
 
